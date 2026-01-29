@@ -30,4 +30,4 @@ RUN npm install -g http-server
 EXPOSE 8080
 
 # Serve static files
-CMD ["http-server", "/deploy/app", "-p", "8080", "--proxy", "http://backend:9160"]
+CMD ["http-server", "/deploy/app", "-p", "8080", "--proxy", "http://backend:8160"]

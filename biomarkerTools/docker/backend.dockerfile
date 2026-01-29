@@ -56,8 +56,8 @@ RUN R CMD javareconf
 # Install R packages required by the application
 RUN R -e "install.packages(c('RJSONIO', 'stringr', 'pROC', 'rJava', 'xlsx'), repos='https://packagemanager.posit.co/cran/__linux__/rhel9/latest', Ncpus=parallel::detectCores())"
 
-# Expose port 9160 (default port for biomarkerTools)
-EXPOSE 9160
+# Expose port 8160 (default port for biomarkerTools)
+EXPOSE 8160
 
 # Run the Flask application
-CMD ["python3", "biomarkerTools.py", "-p", "9160"]
+CMD ["python3", "biomarkerTools.py", "-p", "8160"]

@@ -48,10 +48,10 @@ def api_tunnel(toolName):
 
 
 if __name__ == '__main__':
-    # sandbox/dev (9160/8160)
+    # sandbox/dev (8160)
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", dest="port_number", default="9160", help="Sets the Port")
+    parser.add_argument("-p", dest="port_number", default="8160", help="Sets the Port")
     parser.add_argument("--debug", action="store_true")
 
     args = parser.parse_args()
