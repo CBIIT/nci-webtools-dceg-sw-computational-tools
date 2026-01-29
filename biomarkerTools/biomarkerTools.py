@@ -1,4 +1,10 @@
 from rpy2.robjects import r
+from rpy2.robjects import conversion, default_converter
+import traceback
+
+# Activate default conversion for rpy2 to fix Flask threading issues
+conversion.set_conversion(default_converter)
+
 r.source('biomarkerToolsSuite.R')
 
 from bc.bc import *
@@ -52,4 +58,5 @@ if __name__ == '__main__':
     port_num = int(args.port_number);
 
     hostname = gethostname()
-    app.run(host='0.0.0.0', port=port_num, debug = args.debug, use_evalex = False)
+    # Disable threading to fix rpy2 conversion context issues
+    app.run(host='0.0.0.0', port=port_num, debug = args.debug, use_evalex = False, threaded=False)
