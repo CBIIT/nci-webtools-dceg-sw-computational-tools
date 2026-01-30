@@ -47,6 +47,13 @@ COPY meanstorisk /deploy/app/meanstorisk
 COPY riskStratAdvanced /deploy/app/riskStratAdvanced
 COPY sampleSize /deploy/app/sampleSize
 
+
+# Copy static frontend files
+COPY common /deploy/app/common
+COPY help /deploy/app/help
+COPY images /deploy/app/images
+COPY index.html main.js requires.js styles.css glossary.js glossary-popover.js IEOnly.css favicon.ico /deploy/app/
+
 # Create tmp directory
 RUN mkdir -p /deploy/app/tmp
 
