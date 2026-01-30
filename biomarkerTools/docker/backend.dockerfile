@@ -32,7 +32,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
 ENV LD_LIBRARY_PATH=$JAVA_HOME/lib/server:$LD_LIBRARY_PATH
 
 # Install Python packages
-RUN pip3 install flask rpy2
+RUN pip3 install flask rpy2 gunicorn
 
 # Create application directory
 RUN mkdir -p /deploy/app /deploy/logs
@@ -59,5 +59,7 @@ RUN R -e "install.packages(c('RJSONIO', 'stringr', 'pROC', 'rJava', 'xlsx'), rep
 # Expose port 8160 (default port for biomarkerTools)
 EXPOSE 8160
 
-# Run the Flask application
-CMD ["python3", "biomarkerTools.py", "-p", "8160"]
+
+# Run with Gunicorn - single worker to avoid rpy2 context issues
+# --worker-class sync ensures no threading issues with R
+CMD ["gunicorn", "--bind", "0.0.0.0:8160", "--workers", "1", "--worker-class", "sync", "--timeout", "300", "--log-level", "info", "biomarkerTools:app"]

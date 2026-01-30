@@ -58,5 +58,6 @@ if __name__ == '__main__':
     port_num = int(args.port_number);
 
     hostname = gethostname()
-    # Disable threading to fix rpy2 conversion context issues
-    app.run(host='0.0.0.0', port=port_num, debug = args.debug, use_evalex = False, threaded=False)
+
+    # For development only - use Gunicorn for production
+    app.run(host='0.0.0.0', port=port_num, debug = args.debug, use_evalex = False)
