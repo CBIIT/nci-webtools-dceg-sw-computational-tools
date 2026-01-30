@@ -59,7 +59,6 @@ RUN R -e "install.packages(c('RJSONIO', 'stringr', 'pROC', 'rJava', 'xlsx'), rep
 # Expose port 8160 (default port for biomarkerTools)
 EXPOSE 8160
 
-
 # Run with Gunicorn - single worker to avoid rpy2 context issues
 # --worker-class sync ensures no threading issues with R
 CMD ["gunicorn", "--bind", "0.0.0.0:8160", "--workers", "1", "--worker-class", "sync", "--timeout", "300", "--log-level", "info", "biomarkerTools:app"]
