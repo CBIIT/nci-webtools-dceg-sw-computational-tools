@@ -61,7 +61,16 @@ RUN mkdir -p /deploy/app/tmp
 RUN R CMD javareconf
 
 # Install R packages required by the application
-RUN R -e "install.packages(c('RJSONIO', 'stringr', 'pROC', 'rJava', 'xlsx'), repos='https://packagemanager.posit.co/cran/__linux__/rhel9/latest', Ncpus=parallel::detectCores())"
+# Install from source with multiple mirror fallbacks
+RUN R -e "options(repos=c(CRAN='http://cran.rstudio.com/')); \
+    install.packages('RJSONIO', type='source', Ncpus=parallel::detectCores()); \
+    install.packages('stringr', type='source', Ncpus=parallel::detectCores()); \
+    install.packages('pROC', type='source', Ncpus=parallel::detectCores()); \
+    install.packages('rJava', type='source', Ncpus=parallel::detectCores()); \
+    install.packages('xlsx', type='source', Ncpus=parallel::detectCores())"
+
+# Verify packages are installed
+RUN R -e "library(RJSONIO); library(stringr); library(pROC); library(rJava); library(xlsx)"
 
 # Expose port 8160 (default port for biomarkerTools)
 EXPOSE 8160
