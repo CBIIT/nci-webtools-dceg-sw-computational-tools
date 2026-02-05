@@ -61,6 +61,8 @@ jobs:
             ["ecs_cluster"]="ECS_CLUSTER"
             ["ecs_web_task"]="ECS_WEB_TASK"
             ["ecs_web_service"]="ECS_WEB_SERVICE"
+            ["ecs_worker_task"]="ECS_WORKER_TASK"
+            ["ecs_worker_service"]="ECS_WORKER_SERVICE"
             ["ecs_cpu_units"]="ECS_CPU_UNITS"
             ["ecs_memory_units"]="ECS_MEMORY_UNITS"
             ["role_arn"]="ROLE_ARN"
@@ -100,17 +102,21 @@ jobs:
           cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
           cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,mode=max
 
-      - name: Render task definition
+      - name: Render task definitions
         run: |
           envsubst < $TASK_DEFINITION_TEMPLATE_PATH/web.yml > web.yml
-          echo "Rendered Task Definition:"
+          envsubst < $TASK_DEFINITION_TEMPLATE_PATH/worker.yml > worker.yml
+          echo "Rendered Web Task Definition:"
           cat web.yml
+          echo "Rendered Worker Task Definition:"
+          cat worker.yml
 
-      - name: Register task definition
+      - name: Register task definitions
         run: |
           aws ecs register-task-definition --cli-input-yaml file://web.yml
+          aws ecs register-task-definition --cli-input-yaml file://worker.yml
 
-      - name: Update ECS service
+      - name: Update ECS services
         run: |
           aws ecs update-service \
             --cluster ${{ env.ECS_CLUSTER }} \
@@ -119,18 +125,34 @@ jobs:
             --desired-count 1 \
             --propagate-tags TASK_DEFINITION \
             --force-new-deployment
+          
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_WORKER_SERVICE }} \
+            --task-definition ${{ env.ECS_WORKER_TASK }} \
+            --desired-count 1 \
+            --propagate-tags TASK_DEFINITION \
+            --force-new-deployment
 
       - name: Wait for service stability
         run: |
           aws ecs wait services-stable \
             --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_WEB_SERVICE }}
+            --services ${{ env.ECS_WEB_SERVICE }} ${{ env.ECS_WORKER_SERVICE }}
 
       - name: Remove old task definitions
         run: |
           echo "Pruning old revisions for family: $ECS_WEB_TASK"
           aws ecs list-task-definitions \
             --family-prefix "$ECS_WEB_TASK" \
+            --sort DESC \
+            --query 'taskDefinitionArns[3:]' \
+            --output text \
+          | xargs -n1 -r aws ecs deregister-task-definition --task-definition
+          
+          echo "Pruning old revisions for family: $ECS_WORKER_TASK"
+          aws ecs list-task-definitions \
+            --family-prefix "$ECS_WORKER_TASK" \
             --sort DESC \
             --query 'taskDefinitionArns[3:]' \
             --output text \
