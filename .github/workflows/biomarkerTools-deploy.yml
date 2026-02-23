@@ -45,17 +45,17 @@ jobs:
       - name: Set dynamic environment variables
         run: |
           TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-          REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${APP,,}
+          REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
           
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
           echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
           echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
-          echo "PARAMETER_PATH=/analysistools/${TIER}/${APP}" >> $GITHUB_ENV
+          echo "PARAMETER_PATH=/analysistools/${TIER}/$APP" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
       - name: Retrieve SSM parameters
         run: |
-          PARAMETER_PATH="/analysistools/${TIER}/${APP}"
+          PARAMETER_PATH="/analysistools/${TIER}/$APP"
           
           declare -A PARAMS=(
             ["ecs_cluster"]="ECS_CLUSTER"
@@ -107,8 +107,8 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v6.18.0
         with:
-          context: biomarkertools
-          file: biomarkertools/docker/backend.dockerfile
+          context: biomarkerTools
+          file: biomarkerTools/docker/backend.dockerfile
           pull: true
           push: true
           tags: |
