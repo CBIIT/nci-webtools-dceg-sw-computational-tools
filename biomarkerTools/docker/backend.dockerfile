@@ -7,11 +7,11 @@ RUN dnf -y update \
     cmake \
     R-4.3.2 \
     R-devel \
-    python3 \
-    python3-devel \
-    python3-pip \
-    python3-setuptools \
-    python3-wheel \
+    python3.11 \
+    python3.11-devel \
+    python3.11-pip \
+    python3.11-setuptools \
+    python3.11-wheel \
     java-17-amazon-corretto-devel \
     libcurl-devel \
     openssl-devel \
@@ -27,12 +27,16 @@ RUN dnf -y update \
     tar \
     && dnf clean all
 
+# Restrict Python 3.9 execution to root only
+RUN if [ -f /usr/bin/python3.9 ]; then chmod 700 /usr/bin/python3.9; fi
+
 # Set Java environment variables for R
 ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
-ENV LD_LIBRARY_PATH=$JAVA_HOME/lib/server:$LD_LIBRARY_PATH
+ENV LD_LIBRARY_PATH=/usr/lib/jvm/java-17-amazon-corretto/lib/server
 
 # Install Python packages
-RUN pip3 install flask rpy2 gunicorn
+RUN python3.11 -m pip install --upgrade pip setuptools wheel \
+    && python3.11 -m pip install flask rpy2 gunicorn
 
 # Create application directory
 RUN mkdir -p /deploy/app /deploy/logs
