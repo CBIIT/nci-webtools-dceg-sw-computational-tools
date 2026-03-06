@@ -70,11 +70,10 @@ RUN R -e "options(repos=c(CRAN='http://cran.rstudio.com/')); \
     install.packages('RJSONIO', type='source', Ncpus=parallel::detectCores()); \
     install.packages('stringr', type='source', Ncpus=parallel::detectCores()); \
     install.packages('pROC', type='source', Ncpus=parallel::detectCores()); \
-    install.packages('rJava', type='source', Ncpus=parallel::detectCores()); \
-    install.packages('xlsx', type='source', Ncpus=parallel::detectCores())"
+    install.packages('openxlsx', type='source', Ncpus=parallel::detectCores())"
 
 # Verify packages are installed
-RUN R -e "library(RJSONIO); library(stringr); library(pROC); library(rJava); library(xlsx)"
+RUN R -e "library(RJSONIO); library(stringr); library(pROC); library(openxlsx)"
 
 # Expose port 8160 (default port for biomarkerTools)
 EXPOSE 8160
