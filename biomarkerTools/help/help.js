@@ -15,9 +15,10 @@
       keys = keys.sort();
       for (var index in keys) {
         index = keys[index];
-        $("<p><b>" + terms[index].fullName + ":</b><span> " +
-          (terms[index].glossaryDefinition || terms[index].definition) +
-          "</span></p>").appendTo(glossary);
+        var paragraph = $('<p/>');
+        $('<b/>').text(terms[index].fullName + ':').appendTo(paragraph);
+        $('<span/>').text(' ' + (terms[index].glossaryDefinition || terms[index].definition)).appendTo(paragraph);
+        paragraph.appendTo(glossary);
       }
   });
   
