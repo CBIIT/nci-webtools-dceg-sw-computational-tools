@@ -9,9 +9,6 @@ RUN dnf -y update \
     R-devel \
     python3.11 \
     python3.11-devel \
-    python3.11-pip \
-    python3.11-setuptools \
-    python3.11-wheel \
     java-17-amazon-corretto-devel \
     libcurl-devel \
     openssl-devel \
@@ -28,11 +25,10 @@ RUN dnf -y update \
     && dnf clean all
 
 # Restrict Python 3.9 execution to root only
-RUN if [ -f /usr/bin/python3.9 ]; then chmod 700 /usr/bin/python3.9; fi
+RUN chmod 700 /usr/bin/python3.9
 
 # Set Java environment variables for R
 ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
-ENV LD_LIBRARY_PATH=/usr/lib/jvm/java-17-amazon-corretto/lib/server
 
 # Install Python packages
 RUN python3.11 -m pip install --upgrade pip setuptools wheel \
