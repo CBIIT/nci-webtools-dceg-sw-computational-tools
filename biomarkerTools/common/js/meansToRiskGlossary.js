@@ -62,13 +62,13 @@ $(document).ready(
 			// this only takes care of the input page, needs a separate bind for
 			// the output page
 			bindTermToDefine();
-			var htmlText = "";
 			for ( var abbrev in Glossary) {
 				var term = Glossary[abbrev];
-				htmlText += "<b>" + term.fullName + ":</b> " + term.definition
-						+ "<br/><br/>";
+				var row = $('<div/>');
+				$('<b/>').text(term.fullName + ':').appendTo(row);
+				$('<span/>').text(' ' + term.definition).appendTo(row);
+				$('#glossary').append(row).append($('<br/>')).append($('<br/>'));
 			}
-			$('#glossary').html(htmlText);
 		});
 
 function openHelpWindow(pageURL) {
@@ -90,8 +90,9 @@ function bindTermToDefine() {
 				var term = Glossary[termName];
 				var termToDefineElem = $("#" + id);
 				var termDefinitionElem = $("#" + id + "Definition");
-				termDefinitionElem.html("<h3>" + term.fullName + "</h3>"
-						+ term.definition);
+				termDefinitionElem.empty();
+				$('<h3/>').text(term.fullName).appendTo(termDefinitionElem);
+				$('<p/>').text(term.definition).appendTo(termDefinitionElem);
 				termDefinitionElem.show();
 				//place definition popup at a position left and top down 20 aligned to the center of the id 
 				termDefinitionElem.position({

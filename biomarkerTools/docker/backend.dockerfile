@@ -7,12 +7,8 @@ RUN dnf -y update \
     cmake \
     R-4.3.2 \
     R-devel \
-    python3 \
-    python3-devel \
-    python3-pip \
-    python3-setuptools \
-    python3-wheel \
-    java-17-amazon-corretto-devel \
+    python3.11 \
+    python3.11-devel \
     libcurl-devel \
     openssl-devel \
     libxml2-devel \
@@ -27,12 +23,12 @@ RUN dnf -y update \
     tar \
     && dnf clean all
 
-# Set Java environment variables for R
-ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
-ENV LD_LIBRARY_PATH=$JAVA_HOME/lib/server:$LD_LIBRARY_PATH
+# Restrict Python 3.9 execution to root only
+RUN chmod 700 /usr/bin/python3.9
 
 # Install Python packages
-RUN pip3 install flask rpy2 gunicorn
+RUN python3.11 -m pip install --upgrade pip setuptools wheel \
+    && python3.11 -m pip install flask rpy2 gunicorn
 
 # Create application directory
 RUN mkdir -p /deploy/app /deploy/logs
@@ -66,11 +62,10 @@ RUN R -e "options(repos=c(CRAN='http://cran.rstudio.com/')); \
     install.packages('RJSONIO', type='source', Ncpus=parallel::detectCores()); \
     install.packages('stringr', type='source', Ncpus=parallel::detectCores()); \
     install.packages('pROC', type='source', Ncpus=parallel::detectCores()); \
-    install.packages('rJava', type='source', Ncpus=parallel::detectCores()); \
-    install.packages('xlsx', type='source', Ncpus=parallel::detectCores())"
+    install.packages('openxlsx', type='source', Ncpus=parallel::detectCores())"
 
 # Verify packages are installed
-RUN R -e "library(RJSONIO); library(stringr); library(pROC); library(rJava); library(xlsx)"
+RUN R -e "library(RJSONIO); library(stringr); library(pROC); library(openxlsx)"
 
 # Expose port 8160 (default port for biomarkerTools)
 EXPOSE 8160

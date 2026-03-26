@@ -8,6 +8,38 @@ var default_ajax_error;
 var rest = "biomarkerToolsRest"; // reuse this variable across tools
 var activeRequest = false; // will be used to detect if requests are running
 var custom_po_tmpl = "<div class='popover' role='tooltip'><div class='arrow'></div><h3 class='popover-title'></h3><div class='popover-content'></div></div>";
+var allowedRequireModules = {
+  bc: true,
+  meanstorisk: true,
+  riskStratAdvanced: true,
+  meanRiskStratification: true,
+  help: true,
+};
+
+function getSafeHashId(rawHash) {
+  if (typeof rawHash !== 'string') {
+    return null;
+  }
+  var normalized = rawHash.trim().replace(/^#/, '');
+  if (!/^[A-Za-z][A-Za-z0-9_-]*$/.test(normalized)) {
+    return null;
+  }
+  return normalized;
+}
+
+function getSafeElementIdFromHash(rawHash) {
+  var id = getSafeHashId(rawHash);
+  if (!id) {
+    return null;
+  }
+  return document.getElementById(id) ? id : null;
+}
+
+function requireSafeModule(moduleId) {
+  if (allowedRequireModules[moduleId]) {
+    require([moduleId]);
+  }
+}
 
 function disableAll(){
   // Disable all controls for use during ajax request
@@ -43,25 +75,32 @@ $(document).ready(function(){
 });
 
 $(document).on('hide.bs.tab', function (e) {
-  var id = e.relatedTarget.hash;
-  var currentTab = id.toString().replace('#', '');
-  // set this tab variable to new tab before being shown
-  if(currentTab != "home" && currentTab != "help")
-    thisTool = $(id);
+  if (!e.relatedTarget || !e.relatedTarget.hash) {
+    return;
+  }
+  var safeId = getSafeElementIdFromHash(e.relatedTarget.hash);
+  if (!safeId) {
+    return;
+  }
+  if (safeId !== "home" && safeId !== "help") {
+    thisTool = $('#' + safeId);
+  }
 });
 
 $(document).on('shown.bs.tab', function (e) {
   if(e.target.hash !== undefined){
-    var id = e.target.hash.toString().replace('#', '');
-    if (id != 'home')
-      require([ id ]);
+    var id = getSafeHashId(e.target.hash.toString());
+    if (id && id !== 'home') {
+      requireSafeModule(id);
+    }
   }
 });
 
 $('#contentTabs .nav-tabs').on('show.bs.tab', function(el){
-  var id = el.target.hash.toString().replace('#', '');
-  if (id != 'home')
-    require([id]);
+  var id = getSafeHashId(el.target.hash.toString());
+  if (id && id !== 'home') {
+    requireSafeModule(id);
+  }
   var title = "Biomarker Tools: " + el.target.text;
   document.title = title;
 });
@@ -91,24 +130,36 @@ $('.goToHelp').on('click', function(el){
   var $this = this;
   $(".nav a[href='#help']").tab('show');
   $(".nav a[href='#help']").on('shown.bs.tab', function(){
-    var selector = $($this).attr('href').toString().replace("#","");
-    document.getElementById(selector).scrollIntoView(true);
+    var selector = getSafeElementIdFromHash($($this).attr('href').toString());
+    if (selector) {
+      document.getElementById(selector).scrollIntoView(true);
+    }
   });
 });
 
 $('.goToTab').on('click', function(el){
   el.preventDefault();
   var ref = $(this).attr('href');
+  var safeRefId = getSafeHashId(ref);
+  if (!safeRefId) {
+    return;
+  }
   $('.nav li.active').removeClass('active');
-  $(".nav a[href='" + ref + "']").tab('show').parent().addClass('active');
-  var id = ref.replace("#","");
-  if (id != 'home')
-    require([id]);
+  $(".nav a[href='#" + safeRefId + "']").tab('show').parent().addClass('active');
+  if (safeRefId !== 'home') {
+    requireSafeModule(safeRefId);
+  }
 });
 
 
 function goToTarget(tar) {
-  document.getElementById(tar.hash.replace("#","")).scrollIntoView(true);
+  if (!tar || typeof tar.hash !== 'string') {
+    return;
+  }
+  var safeTarget = getSafeElementIdFromHash(tar.hash);
+  if (safeTarget) {
+    document.getElementById(safeTarget).scrollIntoView(true);
+  }
 }
 
 // misc functions
@@ -139,22 +190,33 @@ function isInt(n){
 }
 
 function display_errors(message) {
-  var text = "";
-
+  var errors = [];
   if ($.isArray(message) && message.length > 0) {
     $(message).each(function (i, v) {
-      text += "<li>" + v + "</li>";
+      errors.push(String(v));
     });
-  }
-  if (typeof message == "string") {
-    text = message;
+  } else if (typeof message == "string") {
+    errors.push(message);
   }
   if(thisTool.find('#errors').length > 0){
     thisTool.find("#errors").empty().remove();
   }
 
-  thisTool.find("#helpGlossaryLinks").after("<div id='errors' class='alert alert-danger fade in'>" +
-                        "<ul class='list-unstyled'>" + text + "</ul></div>");
+  var errorBox = $('<div/>', {
+    id: 'errors',
+    class: 'alert alert-danger fade in'
+  });
+  var list = $('<ul/>', { class: 'list-unstyled' });
+  if (errors.length === 0) {
+    list.append($('<li/>').text('An unexpected error occurred.'));
+  } else {
+    $(errors).each(function (i, v) {
+      list.append($('<li/>').text(v));
+    });
+  }
+  errorBox.append(list);
+
+  thisTool.find("#helpGlossaryLinks").after(errorBox);
 
   thisTool.find('#errors').fadeIn();
   document.querySelector('header').scrollIntoView(true);

@@ -1,9 +1,61 @@
-library('xlsx');
+library('openxlsx');
 
 excelDirectory <- "./tmp/";
 
 writeResultsToExcel <- function (risk, graphName) {
   outwb <- createWorkbook();
+
+  createSheet <- function(wb, sheetName) {
+    addWorksheet(wb, sheetName)
+    sheetName
+  }
+
+  addDataFrame <- function(x, sheet, startRow = 1, startColumn = 1, row.names = FALSE, col.name = TRUE) {
+    writeData(outwb, sheet, x, startRow = startRow, startCol = startColumn, rowNames = row.names, colNames = col.name)
+  }
+
+  autoSizeColumn <- function(sheet, cols) {
+    setColWidths(outwb, sheet, cols = cols, widths = "auto")
+  }
+
+  addPicture <- function(imageFile, sheet, scale = 1, startRow = 1, startColumn = 1) {
+    if (file.exists(imageFile)) {
+      insertImage(outwb, sheet, imageFile, startRow = startRow, startCol = startColumn, width = 6 * scale, height = 4 * scale, units = "in")
+    }
+  }
+
+  Border <- function(...) structure(list(), class = "xlsx_style")
+  CellStyle <- function(...) structure(list(), class = "xlsx_style")
+  Font <- function(...) structure(list(), class = "xlsx_style")
+  Fill <- function(...) structure(list(), class = "xlsx_style")
+  Alignment <- function(...) structure(list(), class = "xlsx_style")
+  `+.xlsx_style` <- function(e1, e2) structure(list(), class = "xlsx_style")
+
+  createRow <- function(sheet, rowIndex) {
+    list(sheet = sheet, rowIndex = rowIndex)
+  }
+
+  createCell <- function(rows, colIndex) {
+    m <- matrix(vector("list", length(rows$rowIndex) * length(colIndex)), nrow = length(rows$rowIndex), ncol = length(colIndex))
+    for (i in seq_along(rows$rowIndex)) {
+      for (j in seq_along(colIndex)) {
+        m[[i, j]] <- list(sheet = rows$sheet, row = rows$rowIndex[i], col = colIndex[j])
+      }
+    }
+    m
+  }
+
+  setCellValue <- function(cell, value) {
+    writeData(outwb, cell$sheet, value, startRow = cell$row, startCol = cell$col, rowNames = FALSE, colNames = FALSE)
+  }
+
+  setCellStyle <- function(cells, cellStyle) {
+    invisible(NULL)
+  }
+
+  addMergedRegion <- function(sheet, startRow, endRow, startColumn, endColumn) {
+    mergeCells(outwb, sheet = sheet, cols = startColumn:endColumn, rows = startRow:endRow)
+  }
   
   bottomBorder <-  Border(color="black", position=c("BOTTOM"), pen=c("BORDER_THIN"));
   rightBorder <-   Border(color="black", position=c("RIGHT"), pen=c("BORDER_THIN"));
@@ -317,7 +369,7 @@ writeResultsToExcel <- function (risk, graphName) {
 
   fileName <- paste(excelDirectory, "means_to_risk_analysis_", time, '.xlsx',sep='');
   
-  saveWorkbook(outwb, fileName);
+  saveWorkbook(outwb, fileName, overwrite = TRUE);
 
   fileName;
 }
