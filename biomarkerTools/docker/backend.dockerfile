@@ -9,6 +9,7 @@ RUN dnf -y update \
     R-devel \
     python3.11 \
     python3.11-devel \
+    python3.11-pip \
     libcurl-devel \
     openssl-devel \
     libxml2-devel \
@@ -52,9 +53,6 @@ COPY index.html main.js requires.js styles.css glossary.js glossary-popover.js I
 
 # Create tmp directory
 RUN mkdir -p /deploy/app/tmp
-
-# Configure Java for R
-RUN R CMD javareconf
 
 # Install R packages required by the application
 # Install from source with multiple mirror fallbacks
