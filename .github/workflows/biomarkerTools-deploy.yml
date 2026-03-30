@@ -1,4 +1,9 @@
 name: Deploy BiomarkerTools
+
+permissions:
+  id-token: write
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:
@@ -13,12 +18,9 @@ on:
           - stage
           - prod
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  deploy-fargate:
+  deploy-fargate-app:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
@@ -29,14 +31,13 @@ jobs:
       BACKEND_CONTAINER_PORT: 8160
       TIER: ${{ inputs.tier }}
       IMAGE_TIER: ${{ contains(fromJson('["dev","qa"]'), inputs.tier) && 'development' || 'release' }}
-      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
+      CICD_ROLE_ARN: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6.0.1
+      - uses: "actions/checkout@v6.0.2"
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v5.1.1
+        uses: aws-actions/configure-aws-credentials@v6.0.0
         with:
           role-to-assume: ${{ env.CICD_ROLE_ARN }}
           role-session-name: ${{ env.TIER }}-${{ env.APP }}-deploy-${{ github.ref_name }}
@@ -44,19 +45,24 @@ jobs:
 
       - name: Set dynamic environment variables
         run: |
+          BRANCH_NAME=${{ github.ref_name }}
+          VERSION=$(echo "$BRANCH_NAME" | awk -F'_' '{print $2}')
+          DATE=$(echo "$BRANCH_NAME" | awk -F'_' '{print $3}')
+          echo "VERSION=${VERSION:-unknown_version}" >> $GITHUB_ENV
+          echo "DATE=${DATE:-unknown_date}" >> $GITHUB_ENV
+
           TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-          REPO=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
-          
+          REPO=${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP
           echo "IMAGE_REPOSITORY=$REPO" >> $GITHUB_ENV
           echo "BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-$TIMESTAMP" >> $GITHUB_ENV
           echo "BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-${{ github.ref_name }}-latest" >> $GITHUB_ENV
-          echo "PARAMETER_PATH=/analysistools/${TIER}/$APP" >> $GITHUB_ENV
           echo "ENVIRONMENT_TIER=${TIER^^}" >> $GITHUB_ENV
 
       - name: Retrieve SSM parameters
         run: |
-          PARAMETER_PATH="/analysistools/${TIER}/$APP"
-          
+          PARAMETER_PATH="/analysistools/${TIER}/${APP}"
+
+          # Define parameters to retrieve (SSM name = ENV_VAR_NAME)
           declare -A PARAMS=(
             ["ecs_cluster"]="ECS_CLUSTER"
             ["ecs_web_task"]="ECS_WEB_TASK"
@@ -67,45 +73,34 @@ jobs:
             ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
             ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
           )
-          
-          MISSING_PARAMS=()
-          
+
+          # Retrieve each parameter and export to environment
           for ssm_name in "${!PARAMS[@]}"; do
             env_var="${PARAMS[$ssm_name]}"
             value=$(aws ssm get-parameter \
               --name "${PARAMETER_PATH}/${ssm_name}" \
               --with-decryption \
               --query "Parameter.Value" \
-              --output text 2>/dev/null || echo "")
-            
-            if [ -z "$value" ]; then
-              MISSING_PARAMS+=("${PARAMETER_PATH}/${ssm_name}")
-              echo "❌ Missing: ${ssm_name}"
-            else
-              echo "${env_var}=${value}" >> $GITHUB_ENV
-              echo "✓ Retrieved ${ssm_name} -> ${env_var}"
-            fi
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
           done
-          
-          if [ ${#MISSING_PARAMS[@]} -gt 0 ]; then
-            echo ""
-            echo "❌ ERROR: Missing required SSM parameters:"
-            for param in "${MISSING_PARAMS[@]}"; do
-              echo "  - $param"
-            done
-            exit 1
-          fi
 
       - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2.0.1
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2.1.0
         with:
           mask-password: true
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.12.0
+        uses: docker/setup-buildx-action@v4.0.0
 
-      - name: Build and push backend image
-        uses: docker/build-push-action@v6.18.0
+      - name: Create and use a new builder instance
+        run: |
+          docker buildx create --name mybuilder --use
+
+      - name: Build backend image ${{ env.BACKEND_IMAGE }}
+        uses: docker/build-push-action@v7.0.0
         with:
           context: biomarkerTools
           file: biomarkerTools/docker/backend.dockerfile
@@ -117,83 +112,42 @@ jobs:
           cache-from: type=registry,ref=${{ env.BACKEND_IMAGE_LATEST }}
           cache-to: type=inline
 
-      - name: Render web task definition
+      - name: Substitute web task definition variables
+        id: substitute-web-task-definition
         run: |
+          echo "Substituting web task definition variables"
           envsubst < $TASK_DEFINITION_TEMPLATE_PATH/web.yml > web.yml
-          echo "Rendered Web Task Definition:"
+
+      - name: Print rendered web task definition
+        run: |
+          echo "Rendered web Task Definition:"
           cat web.yml
 
-      - name: Register web task definition
+      - name: Register task definitions
         run: |
           aws ecs register-task-definition --cli-input-yaml file://web.yml
 
-      - name: Update ECS web service
+      - name: Update web service
         run: |
-          echo "Checking deployment prerequisites..."
-          MISSING_RESOURCES=()
-          
-          # Check if ECS service exists
-          SERVICE_STATUS=$(aws ecs describe-services \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_WEB_SERVICE }} \
-            --query 'services[0].status' \
-            --output text 2>/dev/null || echo "MISSING")
-          
-          if [ "$SERVICE_STATUS" != "ACTIVE" ]; then
-            MISSING_RESOURCES+=("ECS Service: ${{ env.ECS_WEB_SERVICE }} (in cluster ${{ env.ECS_CLUSTER }})")
-          fi
-          
-          # Check for network configuration parameters (needed for service creation)
-          PARAMETER_PATH="/analysistools/${{ env.TIER }}/${{ env.APP }}"
-          
-          SUBNET_IDS=$(aws ssm get-parameter \
-            --name "${PARAMETER_PATH}/subnet_ids" \
-            --query "Parameter.Value" \
-            --output text 2>/dev/null || echo "")
-          
-          SECURITY_GROUP_IDS=$(aws ssm get-parameter \
-            --name "${PARAMETER_PATH}/security_group_ids" \
-            --query "Parameter.Value" \
-            --output text 2>/dev/null || echo "")
-          
-          if [ -z "$SUBNET_IDS" ]; then
-            MISSING_RESOURCES+=("SSM Parameter: ${PARAMETER_PATH}/subnet_ids")
-          fi
-          
-          if [ -z "$SECURITY_GROUP_IDS" ]; then
-            MISSING_RESOURCES+=("SSM Parameter: ${PARAMETER_PATH}/security_group_ids")
-          fi
-          
-          # Report all missing resources
-          if [ ${#MISSING_RESOURCES[@]} -gt 0 ]; then
-            echo ""
-            echo "❌ ERROR: Cannot proceed with deployment. Missing resources:"
-            for resource in "${MISSING_RESOURCES[@]}"; do
-              echo "  - $resource"
-            done
-            echo ""
-            echo "To resolve this:"
-            if [ "$SERVICE_STATUS" != "ACTIVE" ]; then
-              echo "  1. Create the ECS service '${{ env.ECS_WEB_SERVICE }}' manually, OR"
-              echo "  2. Add the missing SSM parameters for automatic service creation"
-            else
-              echo "  - Add the missing SSM parameters listed above"
-            fi
-            exit 1
-          fi
-          
-          echo "✓ All prerequisites met"
-          echo "Updating ECS service..."
           aws ecs update-service \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --service ${{ env.ECS_WEB_SERVICE }} \
-            --task-definition ${{ env.ECS_WEB_TASK }} \
-            --desired-count 1 \
-            --propagate-tags TASK_DEFINITION \
-            --force-new-deployment
+              --cluster ${{ env.ECS_CLUSTER }} \
+              --service ${{ env.ECS_WEB_SERVICE }} \
+              --task-definition ${{ env.ECS_WEB_TASK }} \
+              --desired-count 1 \
+              --propagate-tags TASK_DEFINITION \
+              --force-new-deployment
 
       - name: Remove old task definitions
         run: |
-          echo "Pruning old revisions for family: $ECS_WEB_TASK"
-          aws ecs list-task-definitions --family-prefix "$ECS_WEB_TASK" --sort DESC --query 'taskDefinitionArns[10:]' --output text \
-            | xargs -n1 -r aws ecs deregister-task-definition --task-definition
+          for family in "$ECS_WEB_TASK"; do
+              echo "Pruning old revisions for family: $family"
+              aws ecs list-task-definitions --family-prefix "$family" --sort DESC --query 'taskDefinitionArns[3:]' --output text \
+                  | xargs -n1 -r aws ecs deregister-task-definition --task-definition
+          done
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tier:** ${{ env.TIER }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
