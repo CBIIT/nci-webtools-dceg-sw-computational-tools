@@ -7,17 +7,17 @@ taskRoleArn: ${ROLE_ARN}
 requiresCompatibilities:
   - FARGATE
 containerDefinitions:
-  # - name: logs
-  #   image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
-  #   firelensConfiguration:
-  #     type: fluentbit
-  #   memoryReservation: 50
-  #   logConfiguration:
-  #     logDriver: awslogs
-  #     options:
-  #       awslogs-group: /analysistools/${TIER}/${APP}/web
-  #       awslogs-region: ${AWS_REGION}
-  #       awslogs-stream-prefix: logs
+  - name: logs
+    image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
+    firelensConfiguration:
+      type: fluentbit
+    memoryReservation: 50
+    logConfiguration:
+      logDriver: awslogs
+      options:
+        awslogs-group: /analysistools/${TIER}/${APP}/web
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream-prefix: logs
 
   - name: backend
     image: ${BACKEND_IMAGE_LATEST}
@@ -32,26 +32,20 @@ containerDefinitions:
       - name: PYTHONUNBUFFERED
         value: "1"
     logConfiguration:
-      logDriver: awslogs
+      logDriver: awsfirelens
       options:
-        awslogs-group: /analysistools/${TIER}/${APP}/web
-        awslogs-region: ${AWS_REGION}
-        awslogs-stream-prefix: backend
-    # logConfiguration:
-    #   logDriver: awsfirelens
-    #   options:
-    #     Name: datadog
-    #     tls: "on"
-    #     tls.verify: "off"
-    #     dd_service: ${TIER}-${APP}-backend
-    #     dd_source: python
-    #     dd_tags: project:${APP} tier:${TIER}
-    #     provider: ecs
-    #   secretOptions:
-    #     - name: Host
-    #       valueFrom: /analysistools/${TIER}/datadog/log_endpoint_host
-    #     - name: apikey
-    #       valueFrom: /analysistools/${TIER}/datadog/api_key
+        Name: datadog
+        tls: "on"
+        tls.verify: "off"
+        dd_service: ${TIER}-${APP}-backend
+        dd_source: python
+        dd_tags: project:${APP} tier:${TIER}
+        provider: ecs
+      secretOptions:
+        - name: Host
+          valueFrom: /analysistools/${TIER}/datadog/log_endpoint_host
+        - name: apikey
+          valueFrom: /analysistools/${TIER}/datadog/api_key
     mountPoints:
       - sourceVolume: efs-storage
         containerPath: /deploy/app/tmp
