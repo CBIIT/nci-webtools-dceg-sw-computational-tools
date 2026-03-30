@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/backend.dockerfile
     ports:
-      - "8160:8160"
+      - "80:80"
     volumes:
       - ../tmp:/deploy/app/tmp
     environment:

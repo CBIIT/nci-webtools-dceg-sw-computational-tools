@@ -26,6 +26,6 @@ WORKDIR /deploy/app
 
 COPY . /deploy/app/
 
-EXPOSE 8160
+EXPOSE 80
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8160", "--workers", "1", "--worker-class", "sync", "--timeout", "300", "--log-level", "info", "biomarkerTools:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--worker-class", "sync", "--timeout", "300", "--log-level", "info", "biomarkerTools:app"]
