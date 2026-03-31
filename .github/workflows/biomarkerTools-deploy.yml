@@ -20,7 +20,7 @@ on:
 
 jobs:
   deploy-fargate-app:
-    timeout-minutes: 60
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     environment: ${{ inputs.tier }}
     env:
