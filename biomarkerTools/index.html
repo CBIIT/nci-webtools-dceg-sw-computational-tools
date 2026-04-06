@@ -37,16 +37,35 @@
         id="main">
         <div id="contentTabs">
             <ul class="nav nav-tabs" role="tablist">
-                <li class="active" role="tab" title="Navigate to Home tab"><a href="#home" data-toggle="tab">Home</a></li>
-                <li role="tab" title="Navigate to Means to Risk Stratification tab"><a href="#meanstorisk" data-toggle="tab">Means to Risk</a></li>
-                <li role="tab" title="Navigate to Biomarker Comparison tab"><a href="#bc" data-toggle="tab">Biomarker Comparison</a></li>
-                <li role="tab" title="Navigate to Risk Stratification Advanced Analysis tab"><a href="#riskStratAdvanced" data-toggle="tab">Risk Stratification Advanced Analysis</a></li>
-                <li role="tab"
-                    title="Navigate to Mean Risk Stratification tab"><a href="#meanRiskStratification" data-toggle="tab">Mean Risk Stratification</a></li>
-                <li role="tab" title="Navigate to Help tab"><a href="#help" data-toggle="tab">Help</a></li>
+                <li role="presentation" class="active">
+                    <a href="#home" data-toggle="tab" role="tab" id="home-tab" aria-controls="home" aria-selected="true"
+                        title="Navigate to Home tab">Home</a>
+                </li>
+                <li role="presentation">
+                    <a href="#meanstorisk" data-toggle="tab" role="tab" id="meanstorisk-tab" aria-controls="meanstorisk"
+                        aria-selected="false" title="Navigate to Means to Risk Stratification tab">Means to Risk</a>
+                </li>
+                <li role="presentation">
+                    <a href="#bc" data-toggle="tab" role="tab" id="bc-tab" aria-controls="bc" aria-selected="false"
+                        title="Navigate to Biomarker Comparison tab">Biomarker Comparison</a>
+                </li>
+                <li role="presentation">
+                    <a href="#riskStratAdvanced" data-toggle="tab" role="tab" id="riskStratAdvanced-tab"
+                        aria-controls="riskStratAdvanced" aria-selected="false"
+                        title="Navigate to Risk Stratification Advanced Analysis tab">Risk Stratification Advanced Analysis</a>
+                </li>
+                <li role="presentation">
+                    <a href="#meanRiskStratification" data-toggle="tab" role="tab" id="meanRiskStratification-tab"
+                        aria-controls="meanRiskStratification" aria-selected="false"
+                        title="Navigate to Mean Risk Stratification tab">Mean Risk
+                        Stratification</a>
+                </li>
+                <li role="presentation">
+                    <a href="#help" data-toggle="tab" role="tab" id="help-tab" aria-controls="help" aria-selected="false">Help</a>
+                </li>
             </ul>
             <div class="tab-content clearfix" id="mainTabsContent">
-                <div class="tab-pane fade in active" id="home" role="tabpanel">
+                <div class="tab-pane fade in active" id="home" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                     <h3 title="Home">Biomarker Tools</h3>
                     <p>This toolset estimates risk stratification from early biomarker data and provides strategies to advance
                         biomarkers or other risk measures identified through case-control studies to clinical or public health
@@ -64,7 +83,7 @@
                                 Risk Stratification</a></li>
                     </ul>
                 </div>
-                <div class="tab-pane fade" id="meanstorisk" role="tabpanel">
+                <div class="tab-pane fade" id="meanstorisk" role="tabpanel" aria-labelledby="meanstorisk-tab" tabindex="0">
                     <div class="top_section">
                         <h3 title="Means to Risk Stratification tool">From Difference in Means to Risk Stratification: A Web Tool</h3>
                         <div id="helpGlossaryLinks"><a class="goToGlossary" href="#">Glossary</a></div>
@@ -198,7 +217,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="bc" role="tabpanel">
+                <div class="tab-pane fade" id="bc" role="tabpanel" aria-labelledby="bc-tab" tabindex="0">
                     <h3 title="Biomarker Comparison tool">Biomarker Comparison</h3>
                     <div id="helpGlossaryLinks"><a class="goToGlossary" href="#">Glossary</a></div>
                     <p>This tool plots contours of likelihood ratio positive (LR+) and likelihood ratio negative (LR-) for a
@@ -306,7 +325,7 @@
                                 10.1080/10543400701668308</a></p>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="riskStratAdvanced" role="tabpanel">
+                <div class="tab-pane fade" id="riskStratAdvanced" role="tabpanel" aria-labelledby="riskStratAdvanced-tab" tabindex="0">
                     <h3 title="Risk Stratification Advanced Analysis tool">Risk Stratification Advanced Analysis</h3>
                     <div id="helpGlossaryLinks"><a class="goToHelp" href="#help_riskStratAdvanced">Help</a><a class="goToGlossary" href="#">Glossary</a></div>
                     <div
@@ -373,7 +392,7 @@
                     </div>
                     <div class="output"></div>
                 </div>
-                <div class="tab-pane fade" id="meanRiskStratification" role="tabpanel">
+                <div class="tab-pane fade" id="meanRiskStratification" role="tabpanel" aria-labelledby="meanRiskStratification-tab" tabindex="0">
                     <h3 title="Mean Risk Stratification tool">Mean Risk Stratification</h3>
                     <div id="helpGlossaryLinks"><a class="goToGlossary" href="#">Glossary</a></div>
                     <form class="input panel-group">
@@ -626,7 +645,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="help" role="tabpanel">
+                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="help-tab" tabindex="0">
                     <h3 class="text-left" title="Help content">Help</h3>
                     <ul class="list-unstyled" id="toc">
                         <li><strong><a class="goToTopic" href="#tools-help">Tools Help</a></strong><ul>

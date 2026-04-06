@@ -84,6 +84,8 @@ $(document).on('hide.bs.tab', function (e) {
 });
 
 $(document).on('shown.bs.tab', function (e) {
+  $('[role="tab"]').attr('aria-selected', 'false');
+  $(e.target).attr('aria-selected', 'true');
   if(e.target.hash !== undefined){
     var id = getSafeHashId(e.target.hash.toString());
     if (id && id !== 'home') {
@@ -115,7 +117,8 @@ $('.goToGlossary').on('click', function(el){
   var id = el.target.hash;
   var $this = this;
 
-  $(".nav a[href='#help']").tab('show');
+  $('[role="tab"]').attr('aria-selected', 'false');
+  $(".nav a[href='#help']").attr('aria-selected', 'true').tab('show');
   $(".nav a[href='#help']").on('shown.bs.tab', function(){
     document.getElementById("header-glossary").scrollIntoView(true);
   });
@@ -124,7 +127,8 @@ $('.goToGlossary').on('click', function(el){
 
 $('.goToHelp').on('click', function(el){
   var $this = this;
-  $(".nav a[href='#help']").tab('show');
+  $('[role="tab"]').attr('aria-selected', 'false');
+  $(".nav a[href='#help']").attr('aria-selected', 'true').tab('show');
   $(".nav a[href='#help']").on('shown.bs.tab', function(){
     var selector = getSafeElementIdFromHash($($this).attr('href').toString());
     if (selector) {
@@ -140,8 +144,11 @@ $('.goToTab').on('click', function(el){
   if (!safeRefId) {
     return;
   }
+  $('[role="tab"]').attr('aria-selected', 'false');
   $('.nav li.active').removeClass('active');
-  $(".nav a[href='#" + safeRefId + "']").tab('show').parent().addClass('active');
+  $(".nav a[href='#" + safeRefId + "']")
+    .attr('aria-selected', 'true')
+    .tab('show').parent().addClass('active');
   if (safeRefId !== 'home') {
     requireSafeModule(safeRefId);
   }
