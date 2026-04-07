@@ -30,7 +30,7 @@ function getSafeInitialModuleFromHash(rawHash) {
 
 require(['main'], function(){
     console.log("default scripts loaded");
-        var activeTab = $('[role="tab"].active a').get(0);
+        var activeTab = $('#contentTabs .nav-tabs li.active > a[role="tab"]').get(0);
         if (!activeTab || !activeTab.hash) {
             return {};
         }
