@@ -121,12 +121,7 @@
   }
   
   function bind_option_choices() {
-    thisTool.find(".accordion").collapse({
-      toggle: false
-    });
-  
     thisTool.find( "#input_file_upload" ).on('change', prepare_upload);
-  
   }
   
   function bind_calculate_button() {
