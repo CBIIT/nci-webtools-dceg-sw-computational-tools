@@ -10,6 +10,7 @@ img.expand {
 }
 a {
   color: #00008b;
+  text-decoration: underline;
 }
 p#spinner {
   text-align: center;
