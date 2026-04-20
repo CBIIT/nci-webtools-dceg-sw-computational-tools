@@ -541,6 +541,14 @@ header #branch-logo {
 #meanRiskStratification .input #control-group .table_row:first-child .table_data:last-child {
   width: auto;
 }
+#meanRiskStratification .input #control-group .table_row:last-child {
+  clear: left;
+}
+#meanRiskStratification .input #control-group .table_row:last-child .table_data {
+  overflow: visible;
+  height: auto;
+  min-height: 2.2em;
+}
 #meanRiskStratification .input .option-1 .table_row:first-child,
 #meanRiskStratification .input .option-2 .table_row:first-child {
   background-color: #f5f5f5;
