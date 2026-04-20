@@ -473,11 +473,13 @@
   
   
                thisTool.find(".output").addClass("hide").empty();
-      tabs = $("<div id='tabs'> </div>");
+      tabs = $("<div id='riskstrat-output-tabs'></div>");
       thisTool.find(".output").append(tabs);
-      tab_names = $("<UL> </UL>");
+      tab_names = $("<ul class='nav nav-tabs' role='tablist'></ul>");
+      var tab_content = $("<div class='tab-content'></div>");
       tabs.append(tab_names);
-  
+      tabs.append(tab_content);
+
       for (var fixedIndex = 0; fixedIndex < fixed_values.split(",").length; fixedIndex++) {
         var thisFixedValue = fixedSplit[fixedIndex];
         for ( var shortkey in keyvalueShort) {
@@ -497,19 +499,45 @@
             export: false
           });
         }
-  
-        tab_names.append("<LI><a  class='extra-padding' href='#fixed-" + (fixedIndex + 1) +
-                 "'>" + fixed_type + " "+ thisFixedValue +
-                 "</a></LI>");
-  
-        tab_pane = $("<div class='tab-pane' id='fixed-" + (fixedIndex + 1) +
-               "' >  </div>");
-        tabs.append(tab_pane);
+
+        var panelId = "fixed-" + (fixedIndex + 1);
+        var labelId = "riskstrat-output-tab-label-" + (fixedIndex + 1);
+        var isFirst = (fixedIndex === 0);
+
+        var li = $("<li role='presentation'></li>");
+        if (isFirst) {
+          li.addClass("active");
+        }
+        var tabLink = $("<a></a>")
+          .addClass("extra-padding")
+          .attr("href", "#" + panelId)
+          .attr("data-toggle", "tab")
+          .attr("role", "tab")
+          .attr("id", labelId)
+          .attr("aria-controls", panelId)
+          .attr("aria-selected", isFirst ? "true" : "false")
+          .text(fixed_type + " " + thisFixedValue);
+        li.append(tabLink);
+        tab_names.append(li);
+
+        tab_pane = $("<div></div>")
+          .attr("id", panelId)
+          .attr("role", "tabpanel")
+          .attr("aria-labelledby", labelId)
+          .addClass("tab-pane fade");
+        if (isFirst) {
+          tab_pane.addClass("in active");
+        }
+        tab_content.append(tab_pane);
         var tabId = "#fixed-" + (fixedIndex + 1);
         createTab(thisFixedValue, fixedIndex, fixed_type, independent_type, contour_type, tabId);
       }
-  
-  
+
+      tabs.on("shown.bs.tab", "a[data-toggle='tab']", function () {
+        tabs.find("a[role='tab']").attr("aria-selected", "false");
+        $(this).attr("aria-selected", "true");
+      });
+
       getData(request_data).done(function(response) {
           var data_array = response.data;
           riskStratAdvanced.excelFile = response.excelFile;
@@ -523,8 +551,7 @@
           }
   
         }
-        tabs.tabs();
-  
+
         thisTool.find("#download").removeClass("hide");
         return data_array;
       }).fail(function(request, status, error){
@@ -610,7 +637,13 @@
     });
     e.preventDefault();
   }
-  
+
+  function rsaHeaderIdSlug(s) {
+    var t = String(s).trim().replace(/\./g, "_").replace(/\s+/g, "_").replace(/[^A-Za-z0-9_-]/g, "_");
+    t = t.replace(/_+/g, "_").replace(/^_|_$/g, "");
+    return t || "x";
+  }
+
   function createTab(singleFixed, fixedIndex, fixedType,independentType, contourType, tabElement ){
     var keyvalueIndex = getKeyValueIndex(independentType, fixedType, contourType);
   
@@ -637,7 +670,10 @@
   
     var independentArray = thisTool.find("#independent_rs").val();
     independentArraySplit = independentArray.split(",");
-  
+    for (var ii = 0; ii < independentArraySplit.length; ii++) {
+      independentArraySplit[ii] = independentArraySplit[ii].trim();
+    }
+
     if(singleDataObject.length === 0) return false;
     else {
       var abbreviatedKey = singleDataObject.prefix;
@@ -704,41 +740,46 @@
           "bSort" : false,
           "bPaginate" : false,
           "bDestroy" : true,
-          "aaSorting" : [ [ 0, "asc" ] ],
-          "headerCallback": function ( thead, data, start, end, display ) {
-            $.each(thead.cells, function(i, cell) {
-              $(cell).attr("id", tableId + "_"  + columnHeadings[i].replace(".", "_"));
-            });
-          }
+          "aaSorting" : [ [ 0, "asc" ] ]
         });
-  
+
         $(tabElement + " #table-" + abbreviatedKey + tabnumber).append(table);
-  
+
+        var slugRowDim = rsaHeaderIdSlug(tableFirstRowLabel);
+        var slugContour = rsaHeaderIdSlug(tableFirstColLabel);
+
         thisTool.find(tabElement + " #" + tableId + " tr:first").prepend(
           "<td class='ui-state-default' colspan='2'></td>");
-  
+
         var y = 0;
         thisTool.find(tabElement + " #" + tableId + " tr:not(:first)").each(function(i, tr) {
-            $(tr).prepend("<th id='" + tableId + "_header_" + independentArraySplit[y].replace('.',"_") + "' class='ui-state-default sorting_disabled'>" +
+            var rowSlug = rsaHeaderIdSlug(independentArraySplit[y]);
+            $(tr).prepend("<th scope='row' id='" + tableId + "_header_" + rowSlug + "' class='ui-state-default sorting_disabled'>" +
               independentArraySplit[y] + "</th>");
             y++;
         });
-  
-        thisTool.find(tabElement + " #" + tableId + " tr:eq(1)").prepend("<th id='" + tableId + "-header-" +
-          tableFirstRowLabel + "' class='header' rowspan='" + independentArraySplit.length +
+
+        thisTool.find(tabElement + " #" + tableId + " tr:eq(1)").prepend("<th scope='row' id='" + tableId + "-header-rowdim-" +
+          slugRowDim + "' class='header' rowspan='" + independentArraySplit.length +
           "'><div class='vertical-text'>" + tableFirstRowLabel + "</div></th>");
-  
-  
-             thisTool.find(tabElement + " #" + tableId + " thead").prepend(
-          "<tr><td class='header' colspan='2'></td><th scope='col' class='header' id='" + tableId + "-header-" +
-          tableFirstColLabel + "' colspan='5'>" + tableFirstColLabel + "</th></tr>");
-  
-                      thisTool.find(tabElement + " #" + tableId + " tbody tr").each(function(i, tr) {
-              $(tr).find("td").each(function(j, td) {
-                  $(td).attr("headers", tableId + '_header_' + independentArraySplit[i].replace('.',"_").trim() +
-                             ' ' + tableId + "_"  + columnHeadings[j].replace(".", "_").trim());
-              });
+
+        thisTool.find(tabElement + " #" + tableId + " thead").prepend(
+          "<tr><td class='header' colspan='2'></td><th scope='col' class='header' id='" + tableId + "-header-contour-" +
+          slugContour + "' colspan='5'>" + tableFirstColLabel + "</th></tr>");
+
+        var $rsaTable = thisTool.find(tabElement + " #" + tableId);
+        $rsaTable.find("thead tr").last().find("th").each(function(colIdx) {
+          if (colIdx < columnHeadings.length) {
+            $(this).attr("id", tableId + "_" + rsaHeaderIdSlug(columnHeadings[colIdx])).attr("scope", "col");
+          }
+        });
+
+        $rsaTable.find("tbody tr").each(function(i, tr) {
+          $(tr).find("td").each(function(j, td) {
+            $(td).attr("headers", tableId + "_header_" + rsaHeaderIdSlug(independentArraySplit[i]) + " " +
+              tableId + "_" + rsaHeaderIdSlug(columnHeadings[j]));
           });
+        });
   
             if(graphError != 1) {
           imgAlt = $_Glossary[abbreviatedKey].fullName + " versus " + tableFirstColLabel +
