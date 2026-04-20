@@ -521,15 +521,50 @@ function create_tabbed_table(dt) {
 function make_tabs() {
   var tabs = $("<div id='tabs'></div>");
   $(".tabbed_output_panel").empty().append(tabs);
-  var tab_names = $("<UL> </UL>");
-  tabs.append(tab_names);
+  var tabList = $("<ul class='nav nav-tabs' role='tablist'></ul>");
+  var tabContent = $("<div class='tab-content'></div>");
+  tabs.append(tabList);
+  tabs.append(tabContent);
+
   var index = 0;
-  for(var key in ppv_tabs) {
+  for (var key in ppv_tabs) {
     index++;
-    tab_names.append("<LI><a href='#tab-" + index + "' title='" + ppv_tabs[key] + "'>" + key + "</a></LI>");
-    tabs.append("<DIV id='tab-" + index + "' > " + ppv_tabs[key] + " </div>");
+    var panelId = "tab-" + index;
+    var labelId = "mtr-ppv-tab-" + index;
+    var isFirst = index === 1;
+
+    var li = $("<li role='presentation'></li>");
+    if (isFirst) {
+      li.addClass("active");
+    }
+    var a = $("<a></a>")
+      .attr("href", "#" + panelId)
+      .attr("data-toggle", "tab")
+      .attr("role", "tab")
+      .attr("id", labelId)
+      .attr("aria-controls", panelId)
+      .attr("aria-selected", isFirst ? "true" : "false")
+      .attr("title", ppv_tabs[key])
+      .css({ fontWeight: "bold", fontSize: "1.2em", color: "#000" })
+      .text(key);
+    li.append(a);
+    tabList.append(li);
+
+    var pane = $("<div></div>")
+      .attr("id", panelId)
+      .attr("role", "tabpanel")
+      .attr("aria-labelledby", labelId)
+      .addClass("tab-pane fade");
+    if (isFirst) {
+      pane.addClass("in active");
+    }
+    tabContent.append(pane);
   }
-  tabs.tabs();
+
+  tabs.on("shown.bs.tab", "a[data-toggle='tab']", function () {
+    tabs.find("a[role='tab']").attr("aria-selected", "false");
+    $(this).attr("aria-selected", "true");
+  });
 }
 
 function set_matrix(tab_id, type, table_name, table_second_name, sensitivity_matrix, matrix) {

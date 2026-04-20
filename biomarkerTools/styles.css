@@ -125,6 +125,9 @@ ul.nav.nav-tabs > li:not(.active):hover a {
   .ui-tabs .ui-tabs-panel {
     padding: 1em 0px;
   }
+  #meanstorisk .tabbed_output_panel .tab-pane {
+    padding: 1em 0px;
+  }
 }
 header,
 #main,
@@ -245,7 +248,7 @@ header #branch-logo {
 #meanstorisk #mtr-results .table_data:nth-child(2) {
   width: 16.666666666666668%;
 }
-#meanstorisk .tabbed_output_panel #tabs div {
+#meanstorisk .tabbed_output_panel #tabs .tab-content > .tab-pane {
   overflow: auto;
   padding: 0px;
 }
