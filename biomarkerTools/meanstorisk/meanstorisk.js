@@ -45,6 +45,12 @@
     thisTool.find("#please_wait_calculate").modal({ autoOpen: false, position: 'top', title: "Please Wait", height: 60 });
     thisTool.find("#please_wait_download").modal({ autoOpen: false, position: 'top', title: "Please Wait", height: 60 });
     thisTool.find("#errors").addClass('hide');
+
+    thisTool.off('shown.bs.collapse.mtrAria hidden.bs.collapse.mtrAria', '#file_upload, #cases_control')
+      .on('shown.bs.collapse.mtrAria hidden.bs.collapse.mtrAria', '#file_upload, #cases_control', function() {
+        $(this).removeAttr('aria-expanded');
+      });
+    thisTool.find('#file_upload, #cases_control').removeAttr('aria-expanded');
   
     thisTool.find('.panel-heading a').on('click',function(e) {
       if($(this).parents('.panel').children('.panel-collapse').hasClass('in')) {

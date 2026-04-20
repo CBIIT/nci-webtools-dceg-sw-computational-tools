@@ -91,8 +91,8 @@
                             <div class="input">
                                 <div class="accordion panel panel-default">
                                     <div class="panel-heading"><b>Choose how to enter the data</b></div>
-                                    <div class="panel-heading" data-toggle="collapse"
-                                        data-target="#file_upload"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>User
+                                    <div class="panel-heading"><a href="javascript:void(0);" data-toggle="collapse"
+                                        data-target="#file_upload" aria-controls="file_upload"><div class="glyphicon glyphicon-chevron-down"></div><span>User
                                                 Defined Distribution (from file)</span></a></div>
                                     <div class="panel-body collapse in"
                                         id="file_upload">
@@ -106,7 +106,8 @@
                                         </p>
                                         <p class="indent"><input class="data_entry_by_file" id="input_file_upload" type="file"></p>
                                     </div>
-                                    <div class="panel-heading" data-toggle="collapse" data-target="#cases_control"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>Normal
+                                    <div class="panel-heading"><a href="javascript:void(0);" data-toggle="collapse"
+                                        data-target="#cases_control" aria-controls="cases_control"><div class="glyphicon glyphicon-chevron-down"></div><span>Normal
                                                 Distribution</span></a></div>
                                     <div class="panel-body collapse" id="cases_control">
                                         <div class="panel panel-default">
@@ -406,9 +407,10 @@
                                     <div class="table_padding"><input class="input_field" id="name-input" type="text" name="name-input" maxlength="30"
                                             pattern="^[a-zA-Z0-9_- ]*$" aria-label="Biomarker Name" Placeholder="Biomarker Name"></div>
                                 </div>
-                                <div class="panel-heading" data-parent="#marker-1" data-toggle="collapse" data-target="#marker-1 .option-1"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
+                                <div class="panel-heading"><a href="javascript:void(0);" data-parent="#marker-1" data-toggle="collapse"
+                                        data-target="#marker-1-option-1" aria-controls="marker-1-option-1"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
                                             2x2 Table</span></a></div>
-                                <div class="option-1 panel-body panel-collapse collapse in">
+                                <div id="marker-1-option-1" class="option-1 panel-body panel-collapse collapse in">
                                     <table class="table_container">
                                         <tbody>
                                             <tr class="table_row">
@@ -438,9 +440,10 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="panel-heading" data-parent="#marker-1" data-toggle="collapse" data-target="#marker-1 .option-2"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
+                                <div class="panel-heading"><a href="javascript:void(0);" data-parent="#marker-1" data-toggle="collapse"
+                                        data-target="#marker-1-option-2" aria-controls="marker-1-option-2"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
                                             PPV, NPV, Sensitivity, Specificity, etc.</span></a></div>
-                                <div class="option-2 panel-body panel-collapse collapse">
+                                <div id="marker-1-option-2" class="option-2 panel-body panel-collapse collapse">
                                     <div class="table_padding"><input class="input_field" id="sampsize" name="sampsize" type="number" maxlength="30"
                                             min="1" aria-label="Sample Size" placeholder="Sample Size"></div>
                                     <table class="table_container">

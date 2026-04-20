@@ -1,5 +1,11 @@
 (function() {
   var thisTool = $("#meanRiskStratification");
+
+  /** Bootstrap sets aria-expanded on panel divs (invalid); remove from collapsible regions only. */
+  function stripMrsCollapseRegionAria() {
+    thisTool.find('.accordion .panel-collapse.collapse').removeAttr('aria-expanded');
+  }
+
   init_meanRiskStratification();
   function init_meanRiskStratification() {
     thisTool = $("#meanRiskStratification");
@@ -9,6 +15,11 @@
     thisTool.on('show.bs.collapse','.option-2', function() {
       $(this).prev().prev().collapse('hide');
     })
+    thisTool.off('shown.bs.collapse.mrsAria hidden.bs.collapse.mrsAria', '.panel-collapse.collapse')
+      .on('shown.bs.collapse.mrsAria hidden.bs.collapse.mrsAria', '.panel-collapse.collapse', function() {
+        $(this).removeAttr('aria-expanded');
+      });
+    stripMrsCollapseRegionAria();
   }
   
   $(document).ready(init_meanRiskStratification);
@@ -75,6 +86,17 @@
       newElement.find('[data-target]').each(function() {
         $(this).attr('data-target',$(this).attr('data-target').replace($(this).attr('data-parent'),'#'+elementId))
         $(this).attr('data-parent','#'+elementId);
+      });
+      newElement.find('.option-1.panel-collapse').attr('id', elementId + '-option-1');
+      newElement.find('.option-2.panel-collapse').attr('id', elementId + '-option-2');
+      newElement.find('[data-toggle="collapse"]').each(function() {
+        var $a = $(this);
+        var target = $a.attr('data-target') || '';
+        if (target.indexOf('option-1') !== -1) {
+          $a.attr('aria-controls', elementId + '-option-1');
+        } else if (target.indexOf('option-2') !== -1) {
+          $a.attr('aria-controls', elementId + '-option-2');
+        }
       });
       newElement.find('.panel-heading:first').text('Biomarker #' + numElements);
   
@@ -412,6 +434,8 @@
           break;
       }
     });
+    // collapse('show') on an already-open panel returns before shown.bs.collapse; Collapse ctor still runs addAriaAndCollapsedClass.
+    setTimeout(stripMrsCollapseRegionAria, 0);
   }
   function validate(values) {
     var valid = true;
