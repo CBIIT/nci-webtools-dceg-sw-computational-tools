@@ -31,7 +31,5 @@ EXPOSE 80
 # Create a non-root user
 RUN groupadd -g 1000 app && \
     useradd -m -u 1000 -g app app
-    
-USER app
 
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "--workers", "1", "--worker-class", "sync", "--timeout", "300", "--log-level", "info", "biomarkerTools:app"]
+CMD ["gunicorn", "--user", "app", "--group", "app", "--bind", "0.0.0.0:80", "--workers", "1", "--worker-class", "sync", "--timeout", "300", "--log-level", "info", "biomarkerTools:app"]
