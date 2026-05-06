@@ -163,14 +163,47 @@ function goToTarget(tar) {
 }
 
 // misc functions
-function default_ajax_error(request, status, error){
+function default_ajax_error(request, status, error) {
+  var text = request && request.responseText ? String(request.responseText) : '';
   var logError;
   try {
-    logError = JSON.parse(request.responseText).error;
+    var parsed = JSON.parse(text);
+    if (parsed && typeof parsed.error === 'string' && parsed.error.length > 0) {
+      logError = parsed.error;
+    } else if (parsed && typeof parsed.message === 'string' && parsed.message.length > 0) {
+      logError = parsed.message;
+    }
   } catch (e) {
-    logError = error;
+    logError = undefined;
   }
-  display_errors([logError]);
+  if (logError) {
+    display_errors([logError]);
+    return;
+  }
+  var parts = [];
+  if (request && request.status) {
+    parts.push('HTTP ' + request.status);
+  }
+  if (request && request.statusText) {
+    parts.push(request.statusText);
+  }
+  var errStr = error != null ? String(error).trim() : '';
+  if (errStr.length > 0) {
+    parts.push(errStr);
+  } else {
+    var snippet = text.replace(/\s+/g, ' ').trim();
+    if (snippet && /^<!DOCTYPE/i.test(snippet) === false && /^<html/i.test(snippet) === false) {
+      if (snippet.length > 200) {
+        snippet = snippet.substring(0, 200) + '...';
+      }
+      parts.push(snippet);
+    }
+  }
+  var combined = parts.filter(function (p) { return p && p.length; }).join(' — ');
+  if (!combined) {
+    combined = 'An unexpected error occurred.';
+  }
+  display_errors([combined]);
 }
 
 function isNumberBetweenZeroAndOne(n) {

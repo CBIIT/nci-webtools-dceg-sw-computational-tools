@@ -14,6 +14,16 @@ r_getJSON_PPVNPVprobD = r_mrs_env['getJSON_PPVNPVprobD']
 r_getJSON_sensspecprobM = r_mrs_env['getJSON_sensspecprobM']
 r_getJSON_sensspecprobD = r_mrs_env['getJSON_sensspecprobD']
 
+# Number Needed to Test: invalid when MRS is zero (division by 2/MRS) or CI bound is zero.
+MRS_NNT_ERROR_MSG = (
+    "For this 2\u00d72 table, Mean Risk Stratification is zero, so "
+    "Number Needed to Test is not defined. Enter different cell counts."
+)
+MRS_NNT_GENERIC_MSG = (
+    "Number Needed to Test could not be calculated for this input. "
+    "Try different cell counts or parameters."
+)
+
 # Initialize the Flask application
 app = Flask(__name__)
 
@@ -119,16 +129,23 @@ def mrsRest():
     # NCIATWP-864: add "Number Needed to Test (nnt)"
     for key in biomar:
         mean_risk_stratification = biomar[key]['calculations']['Mean Risk Stratification']
-        value = 0.01 * mean_risk_stratification['Value']
-        lower_bound = 0.01 * mean_risk_stratification['Confidence Interval (lower bound)']
-        upper_bound = 0.01 * mean_risk_stratification['Confidence Interval (upper bound)']
-        bounds = [2 / lower_bound, 2 / upper_bound]
-
-        biomar[key]['calculations']['Number Needed to Test'] = {
-            'Value': round(2 / value),
-            'Confidence Interval (lower bound)': round(min(bounds)),
-            'Confidence Interval (upper bound)': round(max(bounds)),
-        }
+        mrs = mean_risk_stratification['Value']
+        ci_lo = mean_risk_stratification['Confidence Interval (lower bound)']
+        ci_hi = mean_risk_stratification['Confidence Interval (upper bound)']
+        value = 0.01 * mrs
+        lower_bound = 0.01 * ci_lo
+        upper_bound = 0.01 * ci_hi
+        if value == 0 or lower_bound == 0 or upper_bound == 0:
+            return jsonify({'error': MRS_NNT_ERROR_MSG}), 400
+        try:
+            bounds = [2 / lower_bound, 2 / upper_bound]
+            biomar[key]['calculations']['Number Needed to Test'] = {
+                'Value': round(2 / value),
+                'Confidence Interval (lower bound)': round(min(bounds)),
+                'Confidence Interval (upper bound)': round(max(bounds)),
+            }
+        except ZeroDivisionError:
+            return jsonify({'error': MRS_NNT_GENERIC_MSG}), 400
 
     return json.dumps(biomar)
 
