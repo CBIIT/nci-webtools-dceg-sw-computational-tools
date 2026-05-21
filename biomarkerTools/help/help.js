@@ -1,6 +1,12 @@
-(function() {
+(function () {
+  var thisTool = $("#help");
 
   var thisTool = $('#help');
+
+  function toTop(){
+      $('<a/>', { class: 'pull-right', href: '#toc', text: 'Top' }).appendTo(this);
+  }
+
   $(function(){
       thisTool = $('#help');
       var glossary = $('#glossary');
@@ -15,27 +21,20 @@
       keys = keys.sort();
       for (var index in keys) {
         index = keys[index];
-        $("<p><b>" + terms[index].fullName + ":</b><span> " +
-          (terms[index].glossaryDefinition || terms[index].definition) +
-          "</span></p>").appendTo(glossary);
+        var paragraph = $('<p/>');
+        $('<b/>').text(terms[index].fullName + ':').appendTo(paragraph);
+        $('<span/>').text(' ' + (terms[index].glossaryDefinition || terms[index].definition)).appendTo(paragraph);
+        paragraph.appendTo(glossary);
       }
+      thisTool.find('h4').each(toTop);
   });
-  
+
   $('a[href="#help"]').on('shown.bs.tab',function(e){
       thisTool = $("#help");
   });
-  
+
   $('.goToTopic').on('click', function(){
       goToTarget(this);
   });
-  
-  thisTool.find('h4').each(toTop);
-  
-  function toTop(){
-      var el = $("<a class='pull-right' data-target='#top'>Top</a>").on('click', function(){
-          document.getElementById("wrapper").scrollIntoView(true);
-      });
-      $(this).append(el);
-  }
-  
+
 })();

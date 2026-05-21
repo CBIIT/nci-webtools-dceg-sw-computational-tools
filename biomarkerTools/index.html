@@ -37,16 +37,35 @@
         id="main">
         <div id="contentTabs">
             <ul class="nav nav-tabs" role="tablist">
-                <li class="active" role="tab" title="Navigate to Home tab"><a href="#home" data-toggle="tab">Home</a></li>
-                <li role="tab" title="Navigate to Means to Risk Stratification tab"><a href="#meanstorisk" data-toggle="tab">Means to Risk</a></li>
-                <li role="tab" title="Navigate to Biomarker Comparison tab"><a href="#bc" data-toggle="tab">Biomarker Comparison</a></li>
-                <li role="tab" title="Navigate to Risk Stratification Advanced Analysis tab"><a href="#riskStratAdvanced" data-toggle="tab">Risk Stratification Advanced Analysis</a></li>
-                <li role="tab"
-                    title="Navigate to Mean Risk Stratification tab"><a href="#meanRiskStratification" data-toggle="tab">Mean Risk Stratification</a></li>
-                <li role="tab" title="Navigate to Help tab"><a href="#help" data-toggle="tab">Help</a></li>
+                <li role="presentation" class="active">
+                    <a href="#home" data-toggle="tab" role="tab" id="home-tab" aria-controls="home" aria-selected="true"
+                        title="Navigate to Home tab">Home</a>
+                </li>
+                <li role="presentation">
+                    <a href="#meanstorisk" data-toggle="tab" role="tab" id="meanstorisk-tab" aria-controls="meanstorisk"
+                        aria-selected="false" title="Navigate to Means to Risk Stratification tab">Means to Risk</a>
+                </li>
+                <li role="presentation">
+                    <a href="#bc" data-toggle="tab" role="tab" id="bc-tab" aria-controls="bc" aria-selected="false"
+                        title="Navigate to Biomarker Comparison tab">Biomarker Comparison</a>
+                </li>
+                <li role="presentation">
+                    <a href="#riskStratAdvanced" data-toggle="tab" role="tab" id="riskStratAdvanced-tab"
+                        aria-controls="riskStratAdvanced" aria-selected="false"
+                        title="Navigate to Risk Stratification Advanced Analysis tab">Risk Stratification Advanced Analysis</a>
+                </li>
+                <li role="presentation">
+                    <a href="#meanRiskStratification" data-toggle="tab" role="tab" id="meanRiskStratification-tab"
+                        aria-controls="meanRiskStratification" aria-selected="false"
+                        title="Navigate to Mean Risk Stratification tab">Mean Risk
+                        Stratification</a>
+                </li>
+                <li role="presentation">
+                    <a href="#help" data-toggle="tab" role="tab" id="help-tab" aria-controls="help" aria-selected="false">Help</a>
+                </li>
             </ul>
             <div class="tab-content clearfix" id="mainTabsContent">
-                <div class="tab-pane fade in active" id="home" role="tabpanel">
+                <div class="tab-pane fade in active" id="home" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                     <h3 title="Home">Biomarker Tools</h3>
                     <p>This toolset estimates risk stratification from early biomarker data and provides strategies to advance
                         biomarkers or other risk measures identified through case-control studies to clinical or public health
@@ -64,7 +83,7 @@
                                 Risk Stratification</a></li>
                     </ul>
                 </div>
-                <div class="tab-pane fade" id="meanstorisk" role="tabpanel">
+                <div class="tab-pane fade" id="meanstorisk" role="tabpanel" aria-labelledby="meanstorisk-tab" tabindex="0">
                     <div class="top_section">
                         <h3 title="Means to Risk Stratification tool">From Difference in Means to Risk Stratification: A Web Tool</h3>
                         <div id="helpGlossaryLinks"><a class="goToGlossary" href="#">Glossary</a></div>
@@ -72,17 +91,23 @@
                             <div class="input">
                                 <div class="accordion panel panel-default">
                                     <div class="panel-heading"><b>Choose how to enter the data</b></div>
-                                    <div class="panel-heading" data-toggle="collapse"
-                                        data-target="#file_upload"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>User
+                                    <div class="panel-heading"><a href="javascript:void(0);" data-toggle="collapse"
+                                        data-target="#file_upload" aria-controls="file_upload"><div class="glyphicon glyphicon-chevron-down"></div><span>User
                                                 Defined Distribution (from file)</span></a></div>
                                     <div class="panel-body collapse in"
                                         id="file_upload">
-                                        <p class="indent"><label class="data_entry_by_file" for="input_file_upload"><b><span>Upload a raw case
-                                                        and control biomarker data file in csv format</span><a href="meanstorisk/p16-ELISA-sample-data.csv">
-                                                    (Example)</a></b></label></p>
+                                        <p class="indent">
+                                            <label class="data_entry_by_file" for="input_file_upload">
+                                                <b>
+                                                    <span>Upload a raw case and control biomarker data file in csv format</span>
+                                                    <a href="meanstorisk/p16-ELISA-sample-data.csv">(Example)</a>
+                                                </b>
+                                            </label>
+                                        </p>
                                         <p class="indent"><input class="data_entry_by_file" id="input_file_upload" type="file"></p>
                                     </div>
-                                    <div class="panel-heading" data-toggle="collapse" data-target="#cases_control"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>Normal
+                                    <div class="panel-heading"><a href="javascript:void(0);" data-toggle="collapse"
+                                        data-target="#cases_control" aria-controls="cases_control"><div class="glyphicon glyphicon-chevron-down"></div><span>Normal
                                                 Distribution</span></a></div>
                                     <div class="panel-body collapse" id="cases_control">
                                         <div class="panel panel-default">
@@ -132,61 +157,59 @@
                                         <th class="header bold" scope="col">Overall</th>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col">Mean</th>
-                                        <td class="emptyblock" id="mean_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="mean_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="mean_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row">Mean</th>
+                                        <td class="emptyblock" id="mean_cases"></td>
+                                        <td class="emptyblock" id="mean_controls"></td>
+                                        <td class="emptyblock" id="mean_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col">Standard Error</th>
-                                        <td class="emptyblock" id="stderr_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="stderr_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="stderr_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row">Standard Error</th>
+                                        <td class="emptyblock" id="stderr_cases"></td>
+                                        <td class="emptyblock" id="stderr_controls"></td>
+                                        <td class="emptyblock" id="stderr_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col">N</th>
-                                        <td class="emptyblock" id="N_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="N_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="N_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row">N</th>
+                                        <td class="emptyblock" id="N_cases"></td>
+                                        <td class="emptyblock" id="N_controls"></td>
+                                        <td class="emptyblock" id="N_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col">Standard Deviation</th>
-                                        <td class="emptyblock" id="deviation_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="deviation_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="deviation_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row">Standard Deviation</th>
+                                        <td class="emptyblock" id="deviation_cases"></td>
+                                        <td class="emptyblock" id="deviation_controls"></td>
+                                        <td class="emptyblock" id="deviation_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col">Variance</th>
-                                        <td class="emptyblock" id="variance_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="variance_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="variance_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row">Variance</th>
+                                        <td class="emptyblock" id="variance_cases"></td>
+                                        <td class="emptyblock" id="variance_controls"></td>
+                                        <td class="emptyblock" id="variance_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col"><a class="define" href="javascript:void(0);" data-term="CV">Coefficient of Variation
+                                        <th class="text-right bold" scope="row"><a class="define" href="javascript:void(0);" data-term="CV">Coefficient of Variation
                                                 (CV)</a></th>
-                                        <td class="emptyblock" id="cv_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="cv_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="cv_overall" headers="header-ovr"></td>
+                                        <td class="emptyblock" id="cv_cases"></td>
+                                        <td class="emptyblock" id="cv_controls"></td>
+                                        <td class="emptyblock" id="cv_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col">Difference in Mean</th>
-                                        <td class="emptyblock" id="diff_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="diff_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="diff_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row">Difference in Mean</th>
+                                        <td class="emptyblock" id="diff_cases"></td>
+                                        <td class="emptyblock" id="diff_controls"></td>
+                                        <td class="emptyblock" id="diff_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col"><a class="define" href="javascript:void(0);" data-term="Delta">Delta</a></th>
-                                        <td
-                                            class="emptyblock" id="delta_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="delta_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="delta_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row"><a class="define" href="javascript:void(0);" data-term="Delta">Delta</a></th>
+                                        <td class="emptyblock" id="delta_cases"></td>
+                                        <td class="emptyblock" id="delta_controls"></td>
+                                        <td class="emptyblock" id="delta_overall"></td>
                                     </tr>
                                     <tr>
-                                        <th class="text-right bold" scope="col"><a class="define" href="javascript:void(0);" data-term="AUC">AUC</a></th>
-                                        <td class="emptyblock"
-                                            id="auc_cases" headers="header-cases"></td>
-                                        <td class="emptyblock" id="auc_controls" headers="header-controls"></td>
-                                        <td class="emptyblock" id="auc_overall" headers="header-ovr"></td>
+                                        <th class="text-right bold" scope="row"><a class="define" href="javascript:void(0);" data-term="AUC">AUC</a></th>
+                                        <td class="emptyblock" id="auc_cases"></td>
+                                        <td class="emptyblock" id="auc_controls"></td>
+                                        <td class="emptyblock" id="auc_overall"></td>
                                     </tr>
                                 </table>
                             </div>
@@ -198,7 +221,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="bc" role="tabpanel">
+                <div class="tab-pane fade" id="bc" role="tabpanel" aria-labelledby="bc-tab" tabindex="0">
                     <h3 title="Biomarker Comparison tool">Biomarker Comparison</h3>
                     <div id="helpGlossaryLinks"><a class="goToGlossary" href="#">Glossary</a></div>
                     <p>This tool plots contours of likelihood ratio positive (LR+) and likelihood ratio negative (LR-) for a
@@ -306,7 +329,7 @@
                                 10.1080/10543400701668308</a></p>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="riskStratAdvanced" role="tabpanel">
+                <div class="tab-pane fade" id="riskStratAdvanced" role="tabpanel" aria-labelledby="riskStratAdvanced-tab" tabindex="0">
                     <h3 title="Risk Stratification Advanced Analysis tool">Risk Stratification Advanced Analysis</h3>
                     <div id="helpGlossaryLinks"><a class="goToHelp" href="#help_riskStratAdvanced">Help</a><a class="goToGlossary" href="#">Glossary</a></div>
                     <div
@@ -373,7 +396,7 @@
                     </div>
                     <div class="output"></div>
                 </div>
-                <div class="tab-pane fade" id="meanRiskStratification" role="tabpanel">
+                <div class="tab-pane fade" id="meanRiskStratification" role="tabpanel" aria-labelledby="meanRiskStratification-tab" tabindex="0">
                     <h3 title="Mean Risk Stratification tool">Mean Risk Stratification</h3>
                     <div id="helpGlossaryLinks"><a class="goToGlossary" href="#">Glossary</a></div>
                     <form class="input panel-group">
@@ -384,41 +407,43 @@
                                     <div class="table_padding"><input class="input_field" id="name-input" type="text" name="name-input" maxlength="30"
                                             pattern="^[a-zA-Z0-9_- ]*$" aria-label="Biomarker Name" Placeholder="Biomarker Name"></div>
                                 </div>
-                                <div class="panel-heading" data-parent="#marker-1" data-toggle="collapse" data-target="#marker-1 .option-1"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
+                                <div class="panel-heading"><a href="javascript:void(0);" data-parent="#marker-1" data-toggle="collapse"
+                                        data-target="#marker-1-option-1" aria-controls="marker-1-option-1"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
                                             2x2 Table</span></a></div>
-                                <div class="option-1 panel-body panel-collapse collapse in">
+                                <div id="marker-1-option-1" class="option-1 panel-body panel-collapse collapse in">
                                     <table class="table_container">
                                         <tbody>
                                             <tr class="table_row">
-                                                <th class="table_data" scope="col" header="Marker Negative" title="Marker Negative"><a class="define" id="m_neg" href="javascript:void(0);" data-term="m_neg">Marker
+                                                <th class="table_data" scope="col" title="Marker Negative"><a class="define" id="m_neg" href="javascript:void(0);" data-term="m_neg">Marker
                                                         Negative (M-)</a></th>
-                                                <th class="table_data" scope="col" header="Marker Positive"
+                                                <th class="table_data" scope="col"
                                                     title="Marker Positive"><a class="define" id="prob_m" href="javascript:void(0);" data-term="prob_m">Marker
                                                         Positive (M+)</a></th>
                                                 <td class="table_data emptyblock"></td>
                                             </tr>
                                             <tr class="table_row">
-                                                <td class="table_data" headers="m_neg prob_d"><input class="input_field" id="b" name="b" type="number" maxlength="30" aria-label="parameter b"></td>
+                                                <td class="table_data"><input class="input_field" id="b" name="b" type="number" maxlength="30" aria-label="parameter b"></td>
                                                 <td
-                                                    class="table_data" headers="prob_m prob_d"><input class="input_field" id="a" name="a" type="number" maxlength="30" aria-label="parameter a"></td>
-                                                <td
+                                                    class="table_data"><input class="input_field" id="a" name="a" type="number" maxlength="30" aria-label="parameter a"></td>
+                                                <th scope="row"
                                                     class="table_data text-left"><a class="define" id="prob_d" href="javascript:void(0);" data-term="prob_d">Disease
-                                                        Positive (D+)</a></td>
+                                                        Positive (D+)</a></th>
                                             </tr>
                                             <tr class="table_row">
-                                                <td class="table_data" headers="d_neg m_neg"><input class="input_field" id="d" name="d" type="number" maxlength="30" aria-label="parameter d"></td>
+                                                <td class="table_data"><input class="input_field" id="d" name="d" type="number" maxlength="30" aria-label="parameter d"></td>
                                                 <td
-                                                    class="table_data" headers="d_neg prob_m"><input class="input_field" id="c" name="c" type="number" maxlength="30" aria-label="parameter c"></td>
-                                                <td
+                                                    class="table_data"><input class="input_field" id="c" name="c" type="number" maxlength="30" aria-label="parameter c"></td>
+                                                <th scope="row"
                                                     class="table_data text-left"><a class="define" id="d_neg" href="javascript:void(0);" data-term="d_neg">Disease
-                                                        Negative (D-)</a></td>
+                                                        Negative (D-)</a></th>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="panel-heading" data-parent="#marker-1" data-toggle="collapse" data-target="#marker-1 .option-2"><a href="javascript:void(0);"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
+                                <div class="panel-heading"><a href="javascript:void(0);" data-parent="#marker-1" data-toggle="collapse"
+                                        data-target="#marker-1-option-2" aria-controls="marker-1-option-2"><div class="glyphicon glyphicon-chevron-down"></div><span>Input:
                                             PPV, NPV, Sensitivity, Specificity, etc.</span></a></div>
-                                <div class="option-2 panel-body panel-collapse collapse">
+                                <div id="marker-1-option-2" class="option-2 panel-body panel-collapse collapse">
                                     <div class="table_padding"><input class="input_field" id="sampsize" name="sampsize" type="number" maxlength="30"
                                             min="1" aria-label="Sample Size" placeholder="Sample Size"></div>
                                     <table class="table_container">
@@ -466,16 +491,18 @@
                         </div>
                         <div class="table_container" id="control-group">
                             <div class="table_row">
-                                <div class="table_data"><button id="add-marker"><span class="glyphicon glyphicon-plus-sign" alt="Add(+)" title="Add biomarker"></span><span>Add</span></button></div>
-                                <div
-                                    class="table_data"><button id="delete-marker" title="Delete biomarker"><span class="glyphicon glyphicon-minus-sign"
-                                            alt="Delete(-)"></span><span>Delete</span></button></div>
+                                <div class="table_data"><button id="add-marker"><span class="glyphicon glyphicon-plus-sign" alt="Add(+)"
+                                            title="Add biomarker"></span><span>Add</span></button></div>
+                                <div class="table_data"><button id="delete-marker" title="Delete biomarker"><span
+                                            class="glyphicon glyphicon-minus-sign" alt="Delete(-)"></span><span>Delete</span></button></div>
                                 <div class="table_data"><button id="calculate" type="button">Calculate</button></div>
                                 <div class="table_data"><button id="reset" type="reset">Reset</button></div>
                             </div>
                             <div class="table_row">
-                                <div class="table_data"><a id="test1" href="#" title="Populate 1 biomarker using test data">Example 1</a><a id="test2"
-                                        href="#" title="Populate 1 biomarker using test data">Example 2</a></div>
+                                <div class="table_data">
+                                    <a id="test1" href="#" title="Populate 1 biomarker using test data">Example 1</a>
+                                    <a id="test2" href="#" title="Populate 1 biomarker using test data">Example 2</a>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -626,7 +653,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="help" role="tabpanel">
+                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="help-tab" tabindex="0">
                     <h3 class="text-left" title="Help content">Help</h3>
                     <ul class="list-unstyled" id="toc">
                         <li><strong><a class="goToTopic" href="#tools-help">Tools Help</a></strong><ul>
@@ -679,11 +706,18 @@
                     <h4 class="text-left glossary-title" id="faq">FAQ</h4>
                     <section>
                         <article>
-                            <dl><dt>Where do I go for technical support?</dt><dl>Please send an</dl><a href="mailto:NCIMeansToRiskWebAdmin@mail.nih.gov?subject=Biomarker Evaluation Tools"
-                                    title="Biomarker Evaluation Tools">e-mail</a> to our technical support team.</dl>
-                            <dl><dt>What browsers do the web tools support?</dt><dl>The web tools have been designed and tested
-                                    with Internet Explorer 10, Firefox and Chrome.</dl>They do not support Internet Explorer
-                                9 and below.
+                            <dl>
+                                <dt>Where do I go for technical support?</dt>
+                                <dd>Please send an</dd>
+                                <dd>
+                                    <b><a href="mailto:NCIMeansToRiskWebAdmin@mail.nih.gov?subject=Biomarker Evaluation Tools"
+                                            title="Biomarker Evaluation Tools">e-mail</a></b> to our technical support team.
+                                </dd>
+                            </dl>
+                            <dl>
+                                <dt>What browsers do the web tools support?</dt>
+                                <dd>The web tools have been designed and tested with Internet Explorer 10, Firefox and Chrome.</dd>
+                                <dd>They do not support Internet Explorer 9 and below.</dd>
                             </dl>
                         </article>
                     </section>

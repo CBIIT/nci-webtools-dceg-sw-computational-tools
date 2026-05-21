@@ -31,14 +31,8 @@ containerDefinitions:
         value: production
       - name: PYTHONUNBUFFERED
         value: "1"
-    healthCheck:
-      command:
-        - CMD-SHELL
-        - python3 -c 'import urllib.request; urllib.request.urlopen("http://localhost:${BACKEND_CONTAINER_PORT}/ping/")'
-      interval: 30
-      timeout: 10
-      retries: 3
-      startPeriod: 60
+      - name: TZ
+        value: "${TZ}"
     logConfiguration:
       logDriver: awsfirelens
       options:
@@ -58,7 +52,6 @@ containerDefinitions:
       - sourceVolume: efs-storage
         containerPath: /deploy/app/tmp
         readOnly: false
-    memoryReservation: 1024
 
 volumes:
   - name: efs-storage

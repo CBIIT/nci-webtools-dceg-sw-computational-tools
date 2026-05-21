@@ -7,3 +7,6 @@
 **.gz.tbi
 client/build
 **data.zip
+docker/
+docker-compose.yml
+src/

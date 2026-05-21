@@ -10,6 +10,7 @@ img.expand {
 }
 a {
   color: #00008b;
+  text-decoration: underline;
 }
 p#spinner {
   text-align: center;
@@ -122,6 +123,9 @@ ul.nav.nav-tabs > li:not(.active):hover a {
 }
 @media (max-width: 379px) {
   .ui-tabs .ui-tabs-panel {
+    padding: 1em 0px;
+  }
+  #meanstorisk .tabbed_output_panel .tab-pane {
     padding: 1em 0px;
   }
 }
@@ -244,7 +248,7 @@ header #branch-logo {
 #meanstorisk #mtr-results .table_data:nth-child(2) {
   width: 16.666666666666668%;
 }
-#meanstorisk .tabbed_output_panel #tabs div {
+#meanstorisk .tabbed_output_panel #tabs .tab-content > .tab-pane {
   overflow: auto;
   padding: 0px;
 }
@@ -536,6 +540,14 @@ header #branch-logo {
 }
 #meanRiskStratification .input #control-group .table_row:first-child .table_data:last-child {
   width: auto;
+}
+#meanRiskStratification .input #control-group .table_row:last-child {
+  clear: left;
+}
+#meanRiskStratification .input #control-group .table_row:last-child .table_data {
+  overflow: visible;
+  height: auto;
+  min-height: 2.2em;
 }
 #meanRiskStratification .input .option-1 .table_row:first-child,
 #meanRiskStratification .input .option-2 .table_row:first-child {

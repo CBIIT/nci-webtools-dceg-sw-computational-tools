@@ -14,7 +14,24 @@ from riskStratAdvanced.riskStratAdvanced import *
 from sampleSize.sampleSize import *
 
 from flask import Flask, url_for
+
+APP_PATH = "/biomarkerTools"
+
+class PrefixMiddleware:
+    """Strips the app path prefix before Flask routing, sets SCRIPT_NAME for url_for()."""
+    def __init__(self, wsgi_app, prefix):
+        self.app = wsgi_app
+        self.prefix = prefix
+
+    def __call__(self, environ, start_response):
+        path = environ.get('PATH_INFO', '/')
+        if path.startswith(self.prefix):
+            environ['PATH_INFO'] = path[len(self.prefix):] or '/'
+            environ['SCRIPT_NAME'] = environ.get('SCRIPT_NAME', '') + self.prefix
+        return self.app(environ, start_response)
+
 app = Flask(__name__, static_folder='', static_url_path='')
+app.wsgi_app = PrefixMiddleware(app.wsgi_app, APP_PATH)
 
 @app.route('/')
 @app.route('/biomarkerToolsRest')
