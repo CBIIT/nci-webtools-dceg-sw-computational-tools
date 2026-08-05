@@ -26,7 +26,7 @@
     "gulp-pug": "^3.3.0",
     "gulp-jshint": "^2.1.0",
     "gulp-json-editor": "^2.0.2",
-    "gulp-livereload": "^3.8.1",
+    "gulp-livereload": "^4.0.2",
     "gulp-livescript": "^3.0.1",
     "gulp-plumber": "^1.2.0",
     "gulp-strip-comments": "^2.5.2",
