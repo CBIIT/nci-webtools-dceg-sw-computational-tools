@@ -108,12 +108,21 @@
   
   thisTool.find("#contour_dropdown").on("change", lock_fixed_options);
   
+  function ssEscapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function generate_tables(jsonrtn){
     var label = thisTool.find("#contour_dropdown option:selected").text();
   
     for(var i in jsonrtn) {
       var tablesvar = '<div class="table_row">' +
-                        '<div class="table_data">' + label + '</div>' +
+                        '<div class="table_data">' + ssEscapeHtml(label) + '</div>' +
                         '<div class="table_data">Optimal k</div>' +
                         '<div class="table_data">Relative efficiency gain or loss compared to k = 0.5</div>' +
                       '</div>';
@@ -162,17 +171,17 @@
     }
   
     for(var i = 0; i < arrayLength; i++) {
-      tabheaders += '<li><a href="#tab'+(i+1)+'">'+fixed_flag+'<br />'+fixedvals[i]+'</a></li>';
+      tabheaders += '<li><a href="#tab'+(i+1)+'">'+ssEscapeHtml(fixed_flag)+'<br />'+ssEscapeHtml(fixedvals[i])+'</a></li>';
       tabcontent += '<div id="tab'+(i+1)+'" class="clearfix">' +
                       '<div class="left_group">' +
                         '<div class="graph">' +
-                          '<IMG alt="PPV graph image for tab '+(i+1)+'" SRC="tmp/'+pimagename+randomnumber+'-'+(i+1)+'.png" class="expand">' +
+                          '<IMG alt="PPV graph image for tab '+(i+1)+'" SRC="tmp/'+pimagename+ssEscapeHtml(randomnumber)+'-'+(i+1)+'.png" class="expand">' +
                         '</div>' +
                         '<div class="table_container" id="tab'+(i+1)+'ppvdata"></div>' +
                       '</div>' +
                       '<div class="right_group">' +
                         '<div class="graph">' +
-                          '<IMG alt="cNPV graph image for tab '+(i+1)+'" SRC="tmp/'+cimagename+randomnumber+'-'+(i+1)+'.png" class="expand">' +
+                          '<IMG alt="cNPV graph image for tab '+(i+1)+'" SRC="tmp/'+cimagename+ssEscapeHtml(randomnumber)+'-'+(i+1)+'.png" class="expand">' +
                         '</div>' +
                         '<div class="table_container" id="tab'+(i+1)+'cnpvdata"></div>' +
                       '</div>' +
