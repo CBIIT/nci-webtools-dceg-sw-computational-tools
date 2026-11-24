@@ -636,6 +636,15 @@ function rsaHeaderIdSlug(s) {
   return t || "x";
 }
 
+function rsaEscapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function createTab(singleFixed, fixedIndex, fixedType,independentType, contourType, tabElement ){
   var keyvalueIndex = getKeyValueIndex(independentType, fixedType, contourType);
 
@@ -747,17 +756,17 @@ function fillTable(resultObject, index, columnHeadings, rowHeadings) {
       thisTool.find(tabElement + " #" + tableId + " tr:not(:first)").each(function(i, tr) {
           var rowSlug = rsaHeaderIdSlug(independentArraySplit[y]);
           $(tr).prepend("<th scope='row' id='" + tableId + "_header_" + rowSlug + "' class='ui-state-default sorting_disabled'>" +
-            independentArraySplit[y] + "</th>");
+            rsaEscapeHtml(independentArraySplit[y]) + "</th>");
           y++;
       });
 
       thisTool.find(tabElement + " #" + tableId + " tr:eq(1)").prepend("<th scope='row' id='" + tableId + "-header-rowdim-" +
         slugRowDim + "' class='header' rowspan='" + independentArraySplit.length +
-        "'><div class='vertical-text'>" + tableFirstRowLabel + "</div></th>");
+        "'><div class='vertical-text'>" + rsaEscapeHtml(tableFirstRowLabel) + "</div></th>");
 
       thisTool.find(tabElement + " #" + tableId + " thead").prepend(
         "<tr><td class='header' colspan='2'></td><th scope='col' class='header' id='" + tableId + "-header-contour-" +
-        slugContour + "' colspan='5'>" + tableFirstColLabel + "</th></tr>");
+        slugContour + "' colspan='5'>" + rsaEscapeHtml(tableFirstColLabel) + "</th></tr>");
 
       var $rsaTable = thisTool.find(tabElement + " #" + tableId);
       $rsaTable.find("thead tr").last().find("th").each(function(colIdx) {

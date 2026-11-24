@@ -42,10 +42,10 @@ def index():
 def ping():
     try:
         return r('"true"')[0]
-    except Exception as e:
+    except Exception:
         print('------------EXCEPTION------------')
         traceback.print_exc(1)
-        return str(e), 400
+        return 'An internal error occurred. Please try again.', 400
 
 @app.route('/biomarkerToolsRest/')
 @app.route('/biomarkerToolsRest/<toolName>/', methods = ['GET','POST'])
